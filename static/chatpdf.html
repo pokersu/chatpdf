@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>PDF Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      #header {
+        width: 950px;
+        height: 50px;
+        background-color: #4CAF50;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #content {
+        width: 950px;
+        height: 500px;
+        display: grid;
+        grid-template-rows: 1fr 50px;
+        grid-template-columns: 1fr;
+        grid-gap: 10px;
+        justify-content: center;
+        align-items: center;
+      }
+      #pdf-viewer {
+        width: 100%;
+        height: 70%;
+        border: none;
+      }
+      #footer {
+        width: 950px;
+        height: 50px;
+        background-color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .custom-file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      body {
+  background-color: #f5f5f5;
+}
+
+#header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+#content {
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.3);
+  overflow: hidden; /* 防止上传文件时显示滚动条 */
+}
+
+#pdf-viewer {
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+input[type="text"], button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="text"] {
+  width: 70%;
+  margin-right: 10px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3e8e41;
+}
+
+.custom-file-upload {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  font-size: 16px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.custom-file-upload:hover {
+  background-color: #3e8e41;
+}
+      textarea {
+  width: 100%;
+  border: none;
+  resize: vertical; /* 横向自适应，纵向可修改 */
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  height: 300px; /* 新增的代码：设置高度为 300 像素 */
+}
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h1>PDF Viewer</h1>
+    </div>
+    <div id="content">
+      <iframe id="pdf-viewer"></iframe>
+      <div>
+        <label for="file-upload" class="custom-file-upload">Upload PDF</label>
+        <input id="file-upload" type="file" accept=".pdf"/>
+        <textarea rows="4" id="result"></textarea>
+      </div>
+    </div>
+    <div id="footer">
+      <input type="text" id="question" placeholder="Enter your text here">
+      <button id="ask">Ask</button>
+    </div>
+  </body>
+  <script>
+    const input = document.querySelector("#file-upload");
+    const pdfViewer = document.querySelector("#pdf-viewer");
+
+    
+    document.getElementById("ask").addEventListener("click", function(){
+  var xhr = new XMLHttpRequest();
+        var q = document.getElementById("question").value;
+  xhr.open("GET", "/ask?q="+q, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      console.log(xhr.responseText);
+    document.getElementById("result").value = xhr.responseText;
+
+    }
+  };
+  xhr.send();
+});
+    input.addEventListener("change", function() {
+      const file = this.files[0];
+      const fileUrl = URL.createObjectURL(file);
+      pdfViewer.src = fileUrl;
+
+  let formData = new FormData();
+  formData.append('file', file);
+  
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST', '/file/upload');
+  xhr.send(formData);
+  
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log('上传成功!');
+    } else {
+      console.log(`上传失败: ${xhr.status}`);
+    }
+  }
+    });
+  </script>
+</html>
